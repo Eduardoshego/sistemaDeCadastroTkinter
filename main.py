@@ -265,7 +265,8 @@ class Application(Functions):
                                  relheight= 0.99 # Define sua altura em porcentagem.
                                  )
 
-
+def test():
+    print('Testing')
 
 
 Application()
