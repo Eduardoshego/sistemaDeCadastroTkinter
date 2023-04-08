@@ -45,11 +45,24 @@ class Functions():
                                 (self.nome, self.telefone, self.cidade))
             self.connection.commit()
             self.close_connection()
+            self.select_all_for_TreeView()
             messagebox.showinfo('Sucesso', 'Dados salvos com sucesso!')
+            self.clean_entrys()
         except sqlite3.Error as erro:
             print(erro)
             messagebox.showerror('Erro', 'Erro ao salvar os dados!')
 
+    def select_all_for_TreeView(self):
+        try:
+            self.conecta_bd()
+            self.cursor.execute('SELECT * FROM clientes ORDER BY nome ASC')
+            self.result = self.cursor.fetchall()
+            self.close_connection()
+            self.lista_clientes.delete(*self.lista_clientes.get_children())
+            for row in self.result:
+                self.lista_clientes.insert('', END, values=row)
+        except sqlite3.Error as erro:
+            print(erro)
 class Application(Functions):
 
     def __init__(self):
@@ -59,6 +72,7 @@ class Application(Functions):
         self.widgets_frame_1()# -> Chama os widgets do frame 1
         self.list_frame2() # -> Chama os widgets do frame 2
         self.cria_tables() # -> Inicia a criação do banco de dados.
+        self.select_all_for_TreeView() # -> Chama a função para selecionar todos os registros.
         root.mainloop()# mantem a tela em looping loop necessário pois sem ele a tela fecha.
 
     def tela(self):
