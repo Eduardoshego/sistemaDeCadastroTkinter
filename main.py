@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 import sqlite3
+from tkinter import messagebox
 
 root = Tk()
 
@@ -14,29 +15,50 @@ class Functions():
     
     #FUNÇÃO DO BANCO DE DADOS
     def conecta_bd(self):
+        self.connection = sqlite3.connect('database.db')# -> CRIA O BANCO DE DADOS database.db e abre a conexão
+        self.cursor = self.connection.cursor() #variavel que simplifica o uso de comandos do SQLITE3
+    def close_connection(self):
+        self.connection.close()
+    def cria_tables(self):
         try:
-            self.conexao = sqlite3.connect('database.db') # -> CRIA O BANCCO DE DADOS database.db)
-            self.cursor = self.conexao.cursor() #variavel que simplifica o uso de comandos do SQLITE3
+            self.conecta_bd() 
             #comandos do sqlite3 para criaçaõ da tabela.
             self.cursor.execute('''CREATE TABLE IF NOT EXISTS clientes         
                                  (codigo INTEGER PRIMARY KEY,
                                     nome CHAR(40) NOT NULL,
                                     telefone CHAR(10),
-                                    cidade CHAR(10) NOT NULL)'''
+                                    cidade CHAR(10) )'''
                                 )
-            self.conexao.commit() #-> Confirma as mudanças no banco de daddos.
-            self.conexao.close() #-> fecha a conexão com o banco de dados.
+            self.connection.commit() #-> Confirma as mudanças no banco de daddos.
+            self.close_connection()
         except sqlite3.Error as erro:
             print(erro) #-> retorna o resultado do erro se houver.
 
+    def save_data(self):
+        self.codigo = self.entry_codigo.get() # ->Pega o valor da entry_codigo.
+        self.nome = self.entry_nome.get()
+        self.telefone = self.entry_telefone.get()
+        self.cidade = self.entry_cidade.get()
+        try:
+            self.conecta_bd()
+            self.cursor.execute('INSERT INTO clientes (nome, telefone, cidade) VALUES (?,?,?)',
+                                (self.nome, self.telefone, self.cidade))
+            self.connection.commit()
+            self.close_connection()
+            messagebox.showinfo('Sucesso', 'Dados salvos com sucesso!')
+        except sqlite3.Error as erro:
+            print(erro)
+            messagebox.showerror('Erro', 'Erro ao salvar os dados!')
+
 class Application(Functions):
+
     def __init__(self):
         self.root = root #->variável que recebe todos os paramentros do tkinter
         self.tela() #-> Chama a tela principal.
         self.frames_da_tela() #-> Chama os frames da tela
         self.widgets_frame_1()# -> Chama os widgets do frame 1
         self.list_frame2() # -> Chama os widgets do frame 2
-        self.conecta_bd() # -> Inicia a criação do banco de dados.
+        self.cria_tables() # -> Inicia a criação do banco de dados.
         root.mainloop()# mantem a tela em looping loop necessário pois sem ele a tela fecha.
 
     def tela(self):
@@ -95,11 +117,14 @@ class Application(Functions):
                                     font=('verdana', 8,  'bold'))
 
         self.botao_novo = Button(self.frame1,
-                                 text='Novo',
+                                 text='Salvar',
                                  bd=2,
                                  bg= '#D330FA',
                                  fg='black',
-                                 font=('verdana', 8,  'bold'))
+                                 font=('verdana', 8,  'bold'),
+                                 command=self.save_data
+                                 )
+        
         
         self.botao_alterar = Button(self.frame1,
                                     text='Alterar',
