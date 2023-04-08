@@ -17,8 +17,9 @@ class Functions():
         try:
             self.conexao = sqlite3.connect('database.db') # -> CRIA O BANCCO DE DADOS database.db)
             self.cursor = self.conexao.cursor() #variavel que simplifica o uso de comandos do SQLITE3
+            #comandos do sqlite3 para criaçaõ da tabela.
             self.cursor.execute('''CREATE TABLE IF NOT EXISTS clientes         
-                                 (codigo INTEGER PRIMARY KEY AUTO INCREMENT, # -> Cria a tabela com seus dados caso não exista
+                                 (codigo INTEGER PRIMARY KEY,
                                     nome CHAR(40) NOT NULL,
                                     telefone CHAR(10),
                                     cidade CHAR(10) NOT NULL)'''
@@ -35,6 +36,7 @@ class Application(Functions):
         self.frames_da_tela() #-> Chama os frames da tela
         self.widgets_frame_1()# -> Chama os widgets do frame 1
         self.list_frame2() # -> Chama os widgets do frame 2
+        self.conecta_bd() # -> Inicia a criação do banco de dados.
         root.mainloop()# mantem a tela em looping loop necessário pois sem ele a tela fecha.
 
     def tela(self):
